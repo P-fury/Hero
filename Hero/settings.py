@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Hero_app',
 ]
 
 MIDDLEWARE = [
@@ -74,12 +75,13 @@ WSGI_APPLICATION = 'Hero.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+try:
+    from Hero.local_settings import DATABASES
+except ModuleNotFoundError:
+    print("Theres no configuration in local_settings.py!")
+    print("Try to fill data in that file")
+    exit(0)
+
 
 
 # Password validation
