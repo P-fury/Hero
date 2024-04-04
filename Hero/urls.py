@@ -17,8 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from Hero_app import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    path('', views.CharCreateView.as_view(), name='char-create'),
+    path('add_activity_type', views.AddActivityTypeView.as_view(), name='add-activity-type'),
+
+    path('char', views.CharView.as_view(), name='char'),
+
+    path('index', views.index.as_view(), name='index'),
 
 ]
