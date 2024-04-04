@@ -5,7 +5,7 @@ from django.db import models
 
 class ActivityType(models.Model):
     name = models.CharField()
-    type = models.CharField()
+    type = models.CharField(null=True, blank=True)
     body_party = models.CharField(null=True, blank=True)
 
 
@@ -48,15 +48,15 @@ class Day(models.Model):
 
 class Char(models.Model):
     name = models.CharField()
-    height = models.DecimalField(max_digits=3, decimal_places=2)
-    weight = models.DecimalField(max_digits=3, decimal_places=2)
-    bmi = models.DecimalField(max_digits=2, decimal_places=2)
+    height = models.DecimalField(max_digits=5, decimal_places=2)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    bmi = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     age = models.IntegerField()
     fat_percent = models.IntegerField(null=True, blank=True)
     days = models.ForeignKey(Day, on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         if self.height and self.weight:
-            self.bmi = float(self.height)/float(self.weight)
+            self.bmi = float(self.weight)/(float(self.height)/100)**2
         super(Char, self).save(*args, **kwargs)
 
