@@ -1,0 +1,72 @@
+{%  extends 'main.html' %}
+{% block content %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<div>{{ char.name }}</div>
+{{ char.bmi }}
+
+<h2>all workouts:</h2>
+<div>
+    <table>
+        <tr>
+            {% for day in days %}
+            <th>{{ day.date }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for day in days %}
+            <td>
+                <table>
+                    {% for activity in day.activity.all %}
+                    <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+
+<h2>week summary:</h2>
+
+<div>
+    <table>
+        <tr>
+            {% for day in week_summary %}
+            <th>{{ day.date }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for day in week_summary %}
+            <td>
+                <table>
+                    {% for activity in day.activity.all %}
+                    <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>
+
+{% endblock %}

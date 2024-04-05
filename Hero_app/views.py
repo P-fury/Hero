@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView
 
@@ -13,7 +16,7 @@ class CharCreateView(CreateView):
     model = Char
     form_class = CharForm
     template_name = 'char.html'
-    success_url = 'index'
+    success_url = '/'
 
 
 class CharView(ListView):
@@ -22,26 +25,29 @@ class CharView(ListView):
     context_object_name = 'character'
 
 
-class index(View):
+class MainView(View):
     def get(self, request):
-        return render(request, 'index.html')
+        return render(request, 'main.html')
 
 
 class AddActivityTypeView(CreateView):
     model = ActivityType
     form_class = ActivityTypeForm
     template_name = 'add_activity_type.html'
-    success_url = 'index'
+    success_url = '/'
+
+
 class ActivityTypesView(ListView):
     model = ActivityType
     template_name = 'activity_types.html'
     context_object_name = 'activity_types'
 
+
 class AddActivityView(CreateView):
     model = Activity
     form_class = ActivityForm
     template_name = 'add_activity.html'
-    success_url = 'index'
+    success_url = '/'
 
 
 class ActivityView(ListView):
@@ -54,10 +60,25 @@ class AddDayView(CreateView):
     model = Day
     form_class = DayForm
     template_name = 'add_day.html'
-    success_url = 'index'
+    success_url = '/'
+
 
 class DayView(ListView):
     model = Day
     template_name = 'day.html'
     context_object_name = 'day'
 
+
+class CharPageView(View):
+    def get(self, request):
+        today = datetime.now()
+        day_numb = today.weekday()
+        start = today - timedelta(days=day_numb)
+        end = start + timedelta(days=6)
+
+        char = Char.objects.last()
+        days = Day.objects.all().order_by('date')
+        week_summary = days.filter(date__gte=start, date__lte=end)
+        activities = Activity.objects.all()
+        return render(request, 'char_page.html',
+                      {'char': char, 'days': days, 'activities': activities, 'week_summary': week_summary})

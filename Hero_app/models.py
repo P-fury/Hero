@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -45,13 +46,12 @@ class Activity(models.Model):
 @receiver(post_save, sender=Activity)
 def create_day_with_activity(sender, instance, created, **kwargs):
     if created:
-        if Day.objects.get(date=instance.date):
-            Day.objects.get(date=instance.date).activity.add(instance)
-        else:
+        try:
+            day = Day.objects.get(date=instance.date)
+            day.activity.add(instance)
+        except ObjectDoesNotExist:
             new_day = Day.objects.create(date=instance.date)
             new_day.activity.add(instance)
-
-
 
 class Day(models.Model):
     level_of_fatigue = [
