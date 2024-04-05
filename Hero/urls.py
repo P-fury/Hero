@@ -21,6 +21,7 @@ from Hero_app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.MainView.as_view(), name='main'),
 
     path('create_char', views.CharCreateView.as_view(), name='char-create'),
     path('char', views.CharView.as_view(), name='char'),
@@ -34,7 +35,5 @@ urlpatterns = [
     path('add_day', views.AddDayView.as_view(), name='add-day'),
     path('day', views.DayView.as_view(), name='day'),
 
-
-    path('index', views.index.as_view(), name='index'),
-
+    path('char_page', views.CharPageView.as_view(), name='char-page'),
 ]
