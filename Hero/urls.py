@@ -22,10 +22,18 @@ from Hero_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', views.CharCreateView.as_view(), name='char-create'),
-    path('add_activity_type', views.AddActivityTypeView.as_view(), name='add-activity-type'),
-
+    path('create_char', views.CharCreateView.as_view(), name='char-create'),
     path('char', views.CharView.as_view(), name='char'),
+
+    path('add_activity_type', views.AddActivityTypeView.as_view(), name='add-activity-type'),
+    path('activity_types', views.ActivityTypesView.as_view(), name='activity-types'),
+
+    path('add_activity', views.AddActivityView.as_view(), name='add-activity'),
+    path('activity', views.ActivityView.as_view(), name='activities'),
+
+    path('add_day', views.AddDayView.as_view(), name='add-day'),
+    path('day', views.DayView.as_view(), name='day'),
+
 
     path('index', views.index.as_view(), name='index'),
 

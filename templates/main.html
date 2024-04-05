@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+</head>
+<body>
+<a href="{% url 'char-create' %}">Char create</a>
+<a href="{% url 'char' %}">Char</a>
+<a href="{% url 'add-activity-type' %}">Add ActivType</a>
+<a href="{% url 'activity-types' %}">ActivTypes</a>
+<a href="{% url 'add-activity' %}">Add Activity</a>
+<a href="{% url 'activities' %}">Activities list</a>
+<a href="{% url 'add-day' %}">Add Day</a>
+<a href="{% url 'day' %}">Day</a>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

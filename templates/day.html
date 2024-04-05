@@ -1,6 +1,5 @@
 {% extends 'main.html' %}
 {% block content %}
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,13 +10,15 @@
     <title>Document</title>
 </head>
 <body>
-<form method="POST">
-    {% csrf_token %}
-{{ form }}
-    <input type="submit">
-    </form>
+{%  for i in day %}
+<div>{{ i.date }}</div>
+    {% if i.activity.all  %}
+        {% for activity in i.activity.all  %}
+            <div>{{ activity.name }}</div>
+            {% endfor %}
+    {% endif %}
+{% endfor %}
 </body>
 </html>
-
 
 {% endblock %}
