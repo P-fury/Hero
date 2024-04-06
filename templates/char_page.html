@@ -40,12 +40,12 @@
 </div>
 
 <h2>week summary:</h2>
-
 <div>
     <table>
         <tr>
             {% for day in week_summary %}
-            <th>{{ day.date }}</th>
+            <th>{{ day.date }} <br>{{ day.fatigue }}</th>
+              
             {% endfor %}
         </tr>
         <tr>
@@ -56,17 +56,37 @@
                     <tr>
                         <td>{{ activity.name }}</td>
                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                        <td>{{ activity.activity_type }}</td>
                     </tr>
                     {% endfor %}
                 </table>
             </td>
+                
             {% endfor %}
+       
         </tr>
     </table>
 </div>
 
+<ul>
+    {% for activity, count in week_activity.items %}
+        <li>{{ activity }}: {{ count }}</li>
+    {% endfor %}
+{%  if avg_mood %}
+    {{ avg_mood }}
+{% endif %}
+<br>
+{%  if avg_fatigue %}
+    {{ avg_fatigue }}
+{% endif %}
+</ul>
+
+
+
 
 </body>
 </html>
+    
+    
 
 {% endblock %}
