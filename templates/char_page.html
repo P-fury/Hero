@@ -38,13 +38,72 @@
         </tr>
     </table>
 </div>
+<ul>
+    {% for activity, count in whole_activities.items %}
+        <li>{{ activity }}: {{ count }}</li>
+    {% endfor %}
+{%  if avg_mood %}
+   MOOD: {{ avg_mood }}
+{% endif %}
+<br>
+{%  if avg_fatigue %}
+   FATIGUE: {{ avg_fatigue }}
+{% endif %}
+</ul>
+
+
+
+<h2>Month summary:</h2>
+<div>
+    <table>
+        <tr>
+            {% for day in month_summary %}
+            <th>{{ day.date }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for day in month_summary %}
+            <td>
+                <table>
+                    {% for activity in day.activity.all %}
+                    <tr>
+                        <td>{{ activity.name }}</td>
+                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+<ul>
+    {% for activity, count in month_activity.items %}
+        <li>{{ activity }}: {{ count }}</li>
+    {% endfor %}
+{%  if avg_mood_month %}
+   MOOD: {{ avg_mood_month }}
+{% endif %}
+<br>
+{%  if avg_fatigue_month %}
+   FATIGUE: {{ avg_fatigue_month }}
+{% endif %}
+</ul>
+
+
+
+
+
+
+
+
 
 <h2>week summary:</h2>
 <div>
     <table>
         <tr>
             {% for day in week_summary %}
-            <th>{{ day.date }} <br>{{ day.fatigue }}</th>
+            <th>{{ day.date }} <br>DAY Fatigure: {{ day.fatigue }}</th>
               
             {% endfor %}
         </tr>
@@ -72,16 +131,21 @@
     {% for activity, count in week_activity.items %}
         <li>{{ activity }}: {{ count }}</li>
     {% endfor %}
-{%  if avg_mood %}
-    {{ avg_mood }}
+{%  if avg_mood_week %}
+    MOOD: {{ avg_mood_week }}
 {% endif %}
 <br>
-{%  if avg_fatigue %}
-    {{ avg_fatigue }}
+{%  if avg_fatigue_week %}
+   FATIGUE: {{ avg_fatigue_week }}
 {% endif %}
 </ul>
 
+<div class="chart">
+{% if weekly_chart %}
+    <img src="data:image/png;base64, {{weekly_chart|safe}}">
+{% endif %}
 
+</div>
 
 
 </body>
