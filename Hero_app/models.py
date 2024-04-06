@@ -6,6 +6,24 @@ from django.dispatch import receiver
 
 # Create your models here.
 
+
+level_of_fatigue = [
+    (1, 'Very Low'),
+    (2, 'Low'),
+    (3, 'Moderate'),
+    (4, 'High'),
+    (5, 'Very High'),
+]
+mood_level = [
+    (1, 'Unmotivated'),
+    (2, 'Neutral'),
+    (3, 'Ready'),
+    (4, 'Motivated'),
+    (5, 'Eager'),
+]
+
+
+
 class ActivityType(models.Model):
     name = models.CharField()
     type = models.CharField(null=True, blank=True)
@@ -16,13 +34,6 @@ class ActivityType(models.Model):
 
 
 class Activity(models.Model):
-    level_of_fatigue = [
-        (1, 'Very Low'),
-        (2, 'Low'),
-        (3, 'Moderate'),
-        (4, 'High'),
-        (5, 'Very High'),
-    ]
     name = models.CharField()
     date = models.DateField(null=True, blank=True)
     activity_type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, )
@@ -33,16 +44,6 @@ class Activity(models.Model):
     def __str__(self):
         return self.name
 
-
-#     def save(self, *args, **kwargs):
-#         try:
-#             existing_date = Day.objects.get(date=self.date)
-#         except Day.DoesNotExist:
-#             new_day = Day.objects.create(date=self.date)
-#             new_day.activity.add(self)
-#             new_day.save()
-#         super().save(*args, **kwargs)
-#
 @receiver(post_save, sender=Activity)
 def create_day_with_activity(sender, instance, created, **kwargs):
     if created:
@@ -54,20 +55,6 @@ def create_day_with_activity(sender, instance, created, **kwargs):
             new_day.activity.add(instance)
 
 class Day(models.Model):
-    level_of_fatigue = [
-        (1, 'Very Low'),
-        (2, 'Low'),
-        (3, 'Moderate'),
-        (4, 'High'),
-        (5, 'Very High'),
-    ]
-    mood_level = [
-        (1, 'Unmotivated'),
-        (2, 'Neutral'),
-        (3, 'Ready'),
-        (4, 'Motivated'),
-        (5, 'Eager'),
-    ]
     date = models.DateField(unique_for_date=True)
     mood = models.IntegerField(choices=mood_level, null=True, blank=True)
     fatigue = models.IntegerField(choices=level_of_fatigue, null=True, blank=True)
