@@ -16,12 +16,23 @@
 
     <div>{{ char.name }}</div>
     {{ char.bmi }}
+
+    <div id="wight_add">
+        <form method="POST">
+            {% csrf_token %}
+            weight in:
+            <input type="number" step="any" name='weight' id="weight">
+            <input type="submit" name="weight_in" id="weight_in" value="Add">
+        </form>
+    </div>
+
+
     <div class=" buttons_group">
         <button id="all_data_button">Show all data</button>
         <button id="month_summary_button">Show month data</button>
         <button id="week_summary_button">Show week data</button>
     </div>
-    
+
 
     <div id="all_data" style="display: none">
         <h2>all workouts:</h2>
@@ -29,7 +40,7 @@
             <table>
                 <tr>
                     {% for day in days %}
-                        <th>{{ day.date }}</th>
+                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
                     {% endfor %}
                 </tr>
                 <tr>
@@ -40,6 +51,7 @@
                                     <tr>
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                                    <td>Ftg: {{ activity.fatigue }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
@@ -68,14 +80,14 @@
         </div>
     </div>
 
-    
+
     <div id="month_summary" style="display: none">
-    <h2>Month summary:</h2>
+        <h2>Month summary:</h2>
         <div>
             <table>
                 <tr>
                     {% for day in month_summary %}
-                        <th>{{ day.date }}</th>
+                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
                     {% endfor %}
                 </tr>
                 <tr>
@@ -86,6 +98,7 @@
                                     <tr>
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                                    <td>Ftg: {{ activity.fatigue }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
@@ -115,13 +128,13 @@
         </div>
     </div>
 
-<div id="week_summary" style="display: block;">
-    <h2>week summary:</h2>
+    <div id="week_summary" style="display: block;">
+        <h2>week summary:</h2>
         <div>
             <table>
                 <tr>
                     {% for day in week_summary %}
-                        <th>{{ day.date }} <br>DAY Fatigure: {{ day.fatigue }}</th>
+                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a><br>DAY Fatigure: {{ day.fatigue }}</th>
 
                     {% endfor %}
                 </tr>
@@ -134,6 +147,7 @@
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
                                         <td>{{ activity.activity_type }}</td>
+                                    <td>Ftg: {{ activity.fatigue }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>

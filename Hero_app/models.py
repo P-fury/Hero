@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 # Create your models here.
 
 
@@ -21,7 +20,6 @@ mood_level = [
     (4, 'Motivated'),
     (5, 'Eager'),
 ]
-
 
 
 class ActivityType(models.Model):
@@ -44,6 +42,7 @@ class Activity(models.Model):
     def __str__(self):
         return self.name
 
+
 @receiver(post_save, sender=Activity)
 def create_day_with_activity(sender, instance, created, **kwargs):
     if created:
@@ -54,12 +53,13 @@ def create_day_with_activity(sender, instance, created, **kwargs):
             new_day = Day.objects.create(date=instance.date)
             new_day.activity.add(instance)
 
+
 class Day(models.Model):
-    date = models.DateField(unique_for_date=True)
+    date = models.DateField(unique=True)
     mood = models.IntegerField(choices=mood_level, null=True, blank=True)
     fatigue = models.IntegerField(choices=level_of_fatigue, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
-    activity = models.ManyToManyField(Activity, blank=True)
+    activity = models.ManyToManyField(Activity,null=True, blank=True)
 
 
 class Char(models.Model):
@@ -75,3 +75,16 @@ class Char(models.Model):
         if self.height and self.weight:
             self.bmi = float(self.weight) / (float(self.height) / 100) ** 2
         super(Char, self).save(*args, **kwargs)
+
+
+class WeightIn(models.Model):
+    char = models.ForeignKey(Char, on_delete=models.CASCADE)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    create_date = models.DateField(auto_now_add=True)
+
+
+@receiver(post_save, sender=WeightIn)
+def update_weight(sender, instance, created, **kwargs):
+    if created:
+        instance.char.weight = instance.weight
+        instance.char.save()

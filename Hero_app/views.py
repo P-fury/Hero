@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 import math
+
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, UpdateView
 
 from Hero_app.forms import CharForm, ActivityTypeForm, ActivityForm, DayForm
-from Hero_app.models import Char, ActivityType, Activity, Day, level_of_fatigue, mood_level
+from Hero_app.models import Char, ActivityType, Activity, Day, level_of_fatigue, mood_level, WeightIn
 from Hero_app.matplot import get_plot
 
 
@@ -61,13 +63,20 @@ class AddDayView(CreateView):
     model = Day
     form_class = DayForm
     template_name = 'add_day.html'
-    success_url = '/'
+    success_url = reverse_lazy('char-page')
 
 
 class DayView(ListView):
     model = Day
     template_name = 'day.html'
     context_object_name = 'day'
+
+
+class EditDayView(UpdateView):
+    model = Day
+    template_name = 'edit_day.html'
+    fields = ['date', 'mood', 'fatigue', 'note']
+    success_url = reverse_lazy('char-page')
 
 
 class CharPageView(View):
@@ -144,7 +153,6 @@ class CharPageView(View):
             z = sum_activity
             return x, y, z
 
-
         context = {
             'char': char,
             'days': days,
@@ -166,3 +174,16 @@ class CharPageView(View):
         }
         return render(request, 'char_page.html', context
                       )
+
+    def post(self, request):
+        char = Char.objects.last()
+
+        # ---- WEIGHT INS -------
+        if 'weight_in' in request.POST:
+            if request.POST['weight'] != '':
+                WeightIn.objects.create(char=char, weight=request.POST['weight'])
+                return HttpResponseRedirect(reverse_lazy('char-page'))
+            else:
+                return HttpResponseRedirect(reverse_lazy('char-page'))
+        else:
+            return HttpResponseRedirect(reverse_lazy('char-page'))
