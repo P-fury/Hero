@@ -34,6 +34,7 @@ urlpatterns = [
 
     path('add_day', views.AddDayView.as_view(), name='add-day'),
     path('day', views.DayView.as_view(), name='day'),
+    path('edit_day/<int:pk>/', views.EditDayView.as_view(), name='edit-day'),
 
     path('char_page', views.CharPageView.as_view(), name='char-page'),
 ]

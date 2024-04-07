@@ -34,6 +34,7 @@ class DayForm(forms.ModelForm):
     class Meta:
         model = Day
         fields = '__all__'
+        exclude = ['activity']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
