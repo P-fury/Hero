@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import Avg
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -52,6 +53,16 @@ def create_day_with_activity(sender, instance, created, **kwargs):
         except ObjectDoesNotExist:
             new_day = Day.objects.create(date=instance.date)
             new_day.activity.add(instance)
+# @receiver(post_save, sender=Activity)
+# def add_daily_fatigue_to_day(sender, instance, created, **kwargs):
+#     if created:
+#         day = Day.objects.get(date=instance.date)
+#         activities = Activity.objects.filter(date=day.date)
+#         average_fatigue = activities.aggregate(Avg('fatigue'))['fatigue__avg']
+#         if average_fatigue is not None:
+#             day.daily_avg_activity_fatigue = average_fatigue
+#             day.save()
+
 
 
 class Day(models.Model):
@@ -60,6 +71,7 @@ class Day(models.Model):
     fatigue = models.IntegerField(choices=level_of_fatigue, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
     activity = models.ManyToManyField(Activity,null=True, blank=True)
+    daily_avg_activity_fatigue = models.IntegerField(null=True, blank=True)
 
 
 class Char(models.Model):

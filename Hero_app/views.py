@@ -1,8 +1,10 @@
+from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 import math
+from statistics import mean
 
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
@@ -98,51 +100,55 @@ class CharPageView(View):
         end = start + timedelta(days=6)
         week_summary = days.filter(date__gte=start, date__lte=end)
 
-        # ---- WEEK ACITIVITY COUNT ----
+        """ACTIVITY COUNTER
+        Args:
+            activity_range: list of objects Day
+        Returns:
+            sorted dict of activities type and amount of them per week    
+        """
+
         def activity_counter(activity_range):
-            activity_dict = {}
+            activity_dict = defaultdict(int)
             for day in activity_range:
                 for activity in day.activity.all():
-                    if activity.activity_type.name not in activity_dict:
-                        activity_dict[activity.activity_type.name] = 1
-                    else:
-                        activity_dict[activity.activity_type.name] += 1
-            return activity_dict
+                    activity_dict[activity.activity_type.name] += 1
+            return sorted(activity_dict.items(), key=lambda item: item[1], reverse=True)
 
-        # ----- MOOD COUNTER and AVARAGE MOOD FOR WEEK (mood imported form models) ----
-        def avg_mood_level(summary):
-            mood_dict = {}
-            for day in summary:
-                if day.mood:
-                    mood = day.mood
-                    if mood in mood_dict:
-                        mood_dict[mood] += 1
-                    else:
-                        mood_dict[mood] = 1
-            if mood_dict:
-                avg = sum(key * value for key, value in mood_dict.items()) / sum(mood_dict.values())
-                avg_mood = " ".join(
-                    [f'{item}' for value, item in mood_level if value == math.floor(avg) or value == math.ceil(avg)])
-                return avg_mood
+        def daily_fatigue(activity_range):
+            daily_fatigue_avg = defaultdict(list)
+            for day in activity_range:
+                fatigue = [activity.fatigue for activity in day.activity.all()]
+                if fatigue:
+                    date_key = day.date
+                    daily_fatigue_avg[date_key] = mean(fatigue)
+            return daily_fatigue_avg
 
-        # ----- MOOD COUNTER and AVARAGE MOOD FOR WEEK (mood imported form models) ----
-        def avg_fatigue_level(summary):
-            fatigure_dict = {}
-            for day in summary:
-                if day.fatigue:
-                    fatigue = day.fatigue
-                    if fatigue in fatigure_dict:
-                        fatigure_dict[fatigue] += 1
-                    else:
-                        fatigure_dict[fatigue] = 1
-            if fatigure_dict:
-                avg = sum(key * value for key, value in fatigure_dict.items()) / sum(fatigure_dict.values())
-                avg_fatigue = " ".join(
-                    [f'{item}' for value, item in level_of_fatigue if
-                     value == math.floor(avg) or value == math.ceil(avg)])
-                return avg_fatigue
+        """MOOD AVERAGE COUNTER AND DESCRIPTION
+        Args:
+            summary: List of Day objects
+            attribute_name: 'mood' or 'fatigue' attribute
+            level_mapping: List of Choices 
+        Returns:
+            Text description of average mood or fatigue level or None
+        """
 
-        # ----- weakly plot -------
+        def calculate_avg_level(summary, attribute_name, level_mapping):
+            levels = Counter(getattr(day, attribute_name) for day in summary if getattr(day, attribute_name))
+            if levels:
+                avg = sum(key * value for key, value in levels.items()) / sum(levels.values())
+                avg_level_descrtiption = " ".join(
+                    [f'{item}' for value, item in level_mapping if value == math.floor(avg) or value == math.ceil(avg)])
+                return avg_level_descrtiption
+            else:
+                return None
+
+        """Preparing variable for plotting function - get_plot
+        Args:
+            day_objects: List of object contains mood and workouts
+        Returns:
+            x for date,y for mood and z for workouts, ready to pass
+        """
+
         def prep_data_for_plot(day_objects):
             x = [data.date.strftime("%d-%m") for data in day_objects]
             y = [data.mood for data in day_objects]
@@ -153,6 +159,9 @@ class CharPageView(View):
             z = sum_activity
             return x, y, z
 
+
+        print(daily_fatigue(week_summary))
+
         context = {
             'char': char,
             'days': days,
@@ -162,12 +171,15 @@ class CharPageView(View):
             'week_activity': activity_counter(week_summary),
             'month_activity': activity_counter(month_summary),
             'whole_activities': activity_counter(days),
-            'avg_mood_week': avg_mood_level(week_summary),
-            'avg_fatigue_week': avg_fatigue_level(week_summary),
-            'avg_mood_month': avg_mood_level(month_summary),
-            'avg_fatigue_month': avg_fatigue_level(month_summary),
-            'avg_mood': avg_mood_level(days),
-            'avg_fatigue': avg_fatigue_level(days),
+            'daily_avg_fatigue_for_week': daily_fatigue(week_summary),
+            'daily_avg_fatigue_for_month': daily_fatigue(month_summary),
+            'daily_avg_fatigue': daily_fatigue(days),
+            'avg_mood_week': calculate_avg_level(week_summary, "mood", mood_level),
+            'avg_fatigue_week': calculate_avg_level(week_summary, "fatigue", level_of_fatigue),
+            'avg_mood_month': calculate_avg_level(month_summary, "mood", mood_level),
+            'avg_fatigue_month': calculate_avg_level(month_summary, "fatigue", level_of_fatigue),
+            'avg_mood': calculate_avg_level(days, "mood", mood_level),
+            'avg_fatigue': calculate_avg_level(days, "fatigue", level_of_fatigue),
             'weekly_chart': get_plot(prep_data_for_plot(week_summary)),
             'monthly_chart': get_plot(prep_data_for_plot(month_summary)),
             'all_data_chart': get_plot(prep_data_for_plot(days)),
