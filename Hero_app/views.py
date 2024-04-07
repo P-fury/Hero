@@ -7,7 +7,7 @@ from django.views.generic import CreateView, ListView
 
 from Hero_app.forms import CharForm, ActivityTypeForm, ActivityForm, DayForm
 from Hero_app.models import Char, ActivityType, Activity, Day, level_of_fatigue, mood_level
-from Hero_app.numpy import get_plot
+from Hero_app.matplot import get_plot
 
 
 # Create your views here.
@@ -133,12 +133,17 @@ class CharPageView(View):
                      value == math.floor(avg) or value == math.ceil(avg)])
                 return avg_fatigue
 
-        # day_lst = [day.date.weekday() for day in week_summary]
-        # x = [data.date for data in week_summary]
-        # y = [data.activity for data in week_summary.activity.all]
-        # print(x)
-        # print(y)
-        # weekly_chart = get_plot(x, y)
+        # ----- weakly plot -------
+        def prep_data_for_plot(day_objects):
+            x = [data.date.strftime("%d-%m") for data in day_objects]
+            y = [data.mood for data in day_objects]
+            sum_activity = []
+            for day in day_objects:
+                activity_count = day.activity.count()
+                sum_activity.append(activity_count)
+            z = sum_activity
+            return x, y, z
+
 
         context = {
             'char': char,
@@ -155,7 +160,9 @@ class CharPageView(View):
             'avg_fatigue_month': avg_fatigue_level(month_summary),
             'avg_mood': avg_mood_level(days),
             'avg_fatigue': avg_fatigue_level(days),
-            # 'weekly_chart': weekly_chart,
+            'weekly_chart': get_plot(prep_data_for_plot(week_summary)),
+            'monthly_chart': get_plot(prep_data_for_plot(month_summary)),
+            'all_data_chart': get_plot(prep_data_for_plot(days)),
         }
         return render(request, 'char_page.html', context
                       )

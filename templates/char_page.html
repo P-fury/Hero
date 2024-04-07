@@ -1,156 +1,175 @@
-{%  extends 'main.html' %}
+{% extends 'main.html' %}
 {% block content %}
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        {% load static %}
+        <script src="{% static 'javascripts/char_page.js' %}"></script>
 
-<div>{{ char.name }}</div>
-{{ char.bmi }}
+    </head>
+    <body>
 
-<h2>all workouts:</h2>
-<div>
-    <table>
-        <tr>
-            {% for day in days %}
-            <th>{{ day.date }}</th>
-            {% endfor %}
-        </tr>
-        <tr>
-            {% for day in days %}
-            <td>
-                <table>
-                    {% for activity in day.activity.all %}
-                    <tr>
-                        <td>{{ activity.name }}</td>
-                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-            {% endfor %}
-        </tr>
-    </table>
-</div>
-<ul>
-    {% for activity, count in whole_activities.items %}
-        <li>{{ activity }}: {{ count }}</li>
-    {% endfor %}
-{%  if avg_mood %}
-   MOOD: {{ avg_mood }}
-{% endif %}
-<br>
-{%  if avg_fatigue %}
-   FATIGUE: {{ avg_fatigue }}
-{% endif %}
-</ul>
-
-
-
-<h2>Month summary:</h2>
-<div>
-    <table>
-        <tr>
-            {% for day in month_summary %}
-            <th>{{ day.date }}</th>
-            {% endfor %}
-        </tr>
-        <tr>
-            {% for day in month_summary %}
-            <td>
-                <table>
-                    {% for activity in day.activity.all %}
-                    <tr>
-                        <td>{{ activity.name }}</td>
-                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-            {% endfor %}
-        </tr>
-    </table>
-</div>
-<ul>
-    {% for activity, count in month_activity.items %}
-        <li>{{ activity }}: {{ count }}</li>
-    {% endfor %}
-{%  if avg_mood_month %}
-   MOOD: {{ avg_mood_month }}
-{% endif %}
-<br>
-{%  if avg_fatigue_month %}
-   FATIGUE: {{ avg_fatigue_month }}
-{% endif %}
-</ul>
-
-
-
-
-
-
-
-
-
-<h2>week summary:</h2>
-<div>
-    <table>
-        <tr>
-            {% for day in week_summary %}
-            <th>{{ day.date }} <br>DAY Fatigure: {{ day.fatigue }}</th>
-              
-            {% endfor %}
-        </tr>
-        <tr>
-            {% for day in week_summary %}
-            <td>
-                <table>
-                    {% for activity in day.activity.all %}
-                    <tr>
-                        <td>{{ activity.name }}</td>
-                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
-                        <td>{{ activity.activity_type }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-                
-            {% endfor %}
-       
-        </tr>
-    </table>
-</div>
-
-<ul>
-    {% for activity, count in week_activity.items %}
-        <li>{{ activity }}: {{ count }}</li>
-    {% endfor %}
-{%  if avg_mood_week %}
-    MOOD: {{ avg_mood_week }}
-{% endif %}
-<br>
-{%  if avg_fatigue_week %}
-   FATIGUE: {{ avg_fatigue_week }}
-{% endif %}
-</ul>
-
-<div class="chart">
-{% if weekly_chart %}
-    <img src="data:image/png;base64, {{weekly_chart|safe}}">
-{% endif %}
-
-</div>
-
-
-</body>
-</html>
+    <div>{{ char.name }}</div>
+    {{ char.bmi }}
+    <div class=" buttons_group">
+        <button id="all_data_button">Show all data</button>
+        <button id="month_summary_button">Show month data</button>
+        <button id="week_summary_button">Show week data</button>
+    </div>
     
+
+    <div id="all_data" style="display: none">
+        <h2>all workouts:</h2>
+        <div>
+            <table>
+                <tr>
+                    {% for day in days %}
+                        <th>{{ day.date }}</th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for day in days %}
+                        <td>
+                            <table>
+                                {% for activity in day.activity.all %}
+                                    <tr>
+                                        <td>{{ activity.name }}</td>
+                                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        <ul>
+            {% for activity, count in whole_activities.items %}
+                <li>{{ activity }}: {{ count }}</li>
+            {% endfor %}
+            {% if avg_mood %}
+                MOOD: {{ avg_mood }}
+            {% endif %}
+            <br>
+            {% if avg_fatigue %}
+                FATIGUE: {{ avg_fatigue }}
+            {% endif %}
+        </ul>
+        <div class="chart">
+            {% if all_data_chart %}
+                <img src="data:image/png;base64, {{ all_data_chart|safe }}">
+            {% endif %}
+
+        </div>
+    </div>
+
     
+    <div id="month_summary" style="display: none">
+    <h2>Month summary:</h2>
+        <div>
+            <table>
+                <tr>
+                    {% for day in month_summary %}
+                        <th>{{ day.date }}</th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for day in month_summary %}
+                        <td>
+                            <table>
+                                {% for activity in day.activity.all %}
+                                    <tr>
+                                        <td>{{ activity.name }}</td>
+                                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        <ul>
+            {% for activity, count in month_activity.items %}
+                <li>{{ activity }}: {{ count }}</li>
+            {% endfor %}
+            {% if avg_mood_month %}
+                MOOD: {{ avg_mood_month }}
+            {% endif %}
+            <br>
+            {% if avg_fatigue_month %}
+                FATIGUE: {{ avg_fatigue_month }}
+            {% endif %}
+        </ul>
+
+        <div class="chart">
+            {% if monthly_chart %}
+                <img src="data:image/png;base64, {{ monthly_chart|safe }}">
+            {% endif %}
+
+        </div>
+    </div>
+
+<div id="week_summary" style="display: block;">
+    <h2>week summary:</h2>
+        <div>
+            <table>
+                <tr>
+                    {% for day in week_summary %}
+                        <th>{{ day.date }} <br>DAY Fatigure: {{ day.fatigue }}</th>
+
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for day in week_summary %}
+                        <td>
+                            <table>
+                                {% for activity in day.activity.all %}
+                                    <tr>
+                                        <td>{{ activity.name }}</td>
+                                        <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
+                                        <td>{{ activity.activity_type }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+
+                    {% endfor %}
+
+                </tr>
+            </table>
+        </div>
+
+        <ul>
+            {% for activity, count in week_activity.items %}
+                <li>{{ activity }}: {{ count }}</li>
+            {% endfor %}
+            {% if avg_mood_week %}
+                MOOD: {{ avg_mood_week }}
+            {% endif %}
+            <br>
+            {% if avg_fatigue_week %}
+                FATIGUE: {{ avg_fatigue_week }}
+            {% endif %}
+        </ul>
+
+        <div class="chart">
+            {% if weekly_chart %}
+                <img src="data:image/png;base64, {{ weekly_chart|safe }}">
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    </body>
+    </html>
+
+
 
 {% endblock %}
