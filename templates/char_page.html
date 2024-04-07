@@ -40,7 +40,7 @@
             <table>
                 <tr>
                     {% for day in days %}
-                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
+                        <th><a href={% url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
                     {% endfor %}
                 </tr>
                 <tr>
@@ -51,25 +51,35 @@
                                     <tr>
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
-                                    <td>Ftg: {{ activity.fatigue }}</td>
+                                        <td>Ftg: {{ activity.fatigue }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
+                                <table>
+                            <tr>
+                                <td>{% load my_filters %}
+                                    {% if daily_avg_fatigue|get:day.date %}
+                                        avg daily ftg: {{ daily_avg_fatigue|get:day.date }}
+                                    {% else %}
+                                        -
+                                    {% endif %}</td>
+                            </tr>
+                        </table>
                         </td>
                     {% endfor %}
                 </tr>
             </table>
         </div>
         <ul>
-            {% for activity, count in whole_activities.items %}
+            {% for activity, count in whole_activities %}
                 <li>{{ activity }}: {{ count }}</li>
             {% endfor %}
             {% if avg_mood %}
-                MOOD: {{ avg_mood }}
+                avg MOOD: {{ avg_mood }}
             {% endif %}
             <br>
             {% if avg_fatigue %}
-                FATIGUE: {{ avg_fatigue }}
+                avg FATIGUE: {{ avg_fatigue }}
             {% endif %}
         </ul>
         <div class="chart">
@@ -87,7 +97,7 @@
             <table>
                 <tr>
                     {% for day in month_summary %}
-                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
+                        <th><a href={% url 'edit-day' pk=day.pk %}>{{ day.date }}</a></th>
                     {% endfor %}
                 </tr>
                 <tr>
@@ -98,25 +108,36 @@
                                     <tr>
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
-                                    <td>Ftg: {{ activity.fatigue }}</td>
+                                        <td>Ftg: {{ activity.fatigue }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
+                                <table>
+                            <tr>
+                                <td>{% load my_filters %}
+                                    {% if daily_avg_fatigue_for_month|get:day.date %}
+                                        avg daily ftg: {{ daily_avg_fatigue_for_month|get:day.date }}
+                                    {% else %}
+                                        -
+                                    {% endif %}</td>
+                            </tr>
+                        </table>
                         </td>
+                
                     {% endfor %}
                 </tr>
             </table>
         </div>
         <ul>
-            {% for activity, count in month_activity.items %}
+            {% for activity, count in month_activity %}
                 <li>{{ activity }}: {{ count }}</li>
             {% endfor %}
             {% if avg_mood_month %}
-                MOOD: {{ avg_mood_month }}
+                Month MOOD: {{ avg_mood_month }}
             {% endif %}
             <br>
             {% if avg_fatigue_month %}
-                FATIGUE: {{ avg_fatigue_month }}
+                Month FATIGUE: {{ avg_fatigue_month }}
             {% endif %}
         </ul>
 
@@ -134,12 +155,15 @@
             <table>
                 <tr>
                     {% for day in week_summary %}
-                        <th><a href={%url 'edit-day' pk=day.pk %}>{{ day.date }}</a><br>DAY Fatigure: {{ day.fatigue }}</th>
+                        <th><a href={% url 'edit-day' pk=day.pk %}>{{ day.date }}</a><br>DAY Fatigure: {{ day.fatigue }}
+                        </th>
 
                     {% endfor %}
                 </tr>
                 <tr>
                     {% for day in week_summary %}
+
+
                         <td>
                             <table>
                                 {% for activity in day.activity.all %}
@@ -147,9 +171,22 @@
                                         <td>{{ activity.name }}</td>
                                         <td>- {{ activity.duration.hour }}:{{ activity.duration.minute }}</td>
                                         <td>{{ activity.activity_type }}</td>
-                                    <td>Ftg: {{ activity.fatigue }}</td>
+                                        <td>Ftg: {{ activity.fatigue }}</td>
+
+
                                     </tr>
+
                                 {% endfor %}
+                            </table>
+                            <table>
+                                <tr>
+                                    <td>{% load my_filters %}
+                                        {% if daily_avg_fatigue_for_week|get:day.date %}
+                                            avg daily ftg: {{ daily_avg_fatigue_for_week|get:day.date }}
+                                        {% else %}
+                                            -
+                                        {% endif %}</td>
+                                </tr>
                             </table>
                         </td>
 
@@ -160,15 +197,15 @@
         </div>
 
         <ul>
-            {% for activity, count in week_activity.items %}
+            {% for activity, count in week_activity %}
                 <li>{{ activity }}: {{ count }}</li>
             {% endfor %}
             {% if avg_mood_week %}
-                MOOD: {{ avg_mood_week }}
+                Week MOOD: {{ avg_mood_week }}
             {% endif %}
             <br>
             {% if avg_fatigue_week %}
-                FATIGUE: {{ avg_fatigue_week }}
+                Week FATIGUE: {{ avg_fatigue_week }}
             {% endif %}
         </ul>
 
