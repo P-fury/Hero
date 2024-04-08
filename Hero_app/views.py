@@ -13,6 +13,8 @@ from Hero_app.forms import CharForm, ActivityTypeForm, ActivityForm, DayForm
 from Hero_app.models import Char, ActivityType, Activity, Day, level_of_fatigue, mood_level, WeightIn
 from Hero_app.matplot import get_plot
 
+from django.utils import timezone
+
 
 # Create your views here.
 
@@ -83,6 +85,7 @@ class EditDayView(UpdateView):
 
 class CharPageView(View):
     def get(self, request):
+        global remember_date
         char = Char.objects.last()
         today = datetime.now()
         activities = Activity.objects.all()
@@ -159,8 +162,25 @@ class CharPageView(View):
             z = sum_activity
             return x, y, z
 
+        if request.GET.get('week_data'):
+            last_added_day = days.last()
+            week_data = last_added_day.date.weekday()
+            start = last_added_day.date - timedelta(days=week_data)
+            end = start + timedelta(days=6)
+            days = days.filter(date__gte=start, date__lte=end)
+            remember_date = start
 
-        print(daily_fatigue(week_summary))
+        if request.GET.get('week_previous'):
+            start = remember_date - timedelta(days=7)
+            end = start + timedelta(days=6)
+            days = days.filter(date__gte=start, date__lte=end)
+            remember_date = start
+
+        if request.GET.get('week_next'):
+            start = remember_date + timedelta(days=7)
+            end = start + timedelta(days=6)
+            days = days.filter(date__gte=start, date__lte=end)
+            remember_date = start
 
         context = {
             'char': char,
@@ -173,7 +193,7 @@ class CharPageView(View):
             'whole_activities': activity_counter(days),
             'daily_avg_fatigue_for_week': daily_fatigue(week_summary),
             'daily_avg_fatigue_for_month': daily_fatigue(month_summary),
-            'daily_avg_fatigue': daily_fatigue(days),
+            # 'daily_avg_fatigue': daily_fatigue(days),
             'avg_mood_week': calculate_avg_level(week_summary, "mood", mood_level),
             'avg_fatigue_week': calculate_avg_level(week_summary, "fatigue", level_of_fatigue),
             'avg_mood_month': calculate_avg_level(month_summary, "mood", mood_level),
@@ -183,6 +203,7 @@ class CharPageView(View):
             'weekly_chart': get_plot(prep_data_for_plot(week_summary)),
             'monthly_chart': get_plot(prep_data_for_plot(month_summary)),
             'all_data_chart': get_plot(prep_data_for_plot(days)),
+
         }
         return render(request, 'char_page.html', context
                       )
