@@ -53,16 +53,6 @@ def create_day_with_activity(sender, instance, created, **kwargs):
         except ObjectDoesNotExist:
             new_day = Day.objects.create(date=instance.date)
             new_day.activity.add(instance)
-# @receiver(post_save, sender=Activity)
-# def add_daily_fatigue_to_day(sender, instance, created, **kwargs):
-#     if created:
-#         day = Day.objects.get(date=instance.date)
-#         activities = Activity.objects.filter(date=day.date)
-#         average_fatigue = activities.aggregate(Avg('fatigue'))['fatigue__avg']
-#         if average_fatigue is not None:
-#             day.daily_avg_activity_fatigue = average_fatigue
-#             day.save()
-
 
 
 class Day(models.Model):
@@ -70,8 +60,7 @@ class Day(models.Model):
     mood = models.IntegerField(choices=mood_level, null=True, blank=True)
     fatigue = models.IntegerField(choices=level_of_fatigue, null=True, blank=True)
     note = models.TextField(null=True, blank=True)
-    activity = models.ManyToManyField(Activity,null=True, blank=True)
-    daily_avg_activity_fatigue = models.IntegerField(null=True, blank=True)
+    activity = models.ManyToManyField(Activity, null=True, blank=True)
 
 
 class Char(models.Model):
@@ -84,9 +73,19 @@ class Char(models.Model):
     days = models.ForeignKey(Day, on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
-        if self.height and self.weight:
+        if self.pk:
+            old_char = Char.objects.get(pk=self.pk)
+            if old_char.height != self.height or old_char.weight != self.weight:
+                self.bmi = float(self.weight) / (float(self.height) / 100) ** 2
+        else:
             self.bmi = float(self.weight) / (float(self.height) / 100) ** 2
         super(Char, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Char)
+def add_weight_in(sender, instance, created, **kwargs):
+    if created:
+        WeightIn.objects.create(weight=instance.weight)
 
 
 class WeightIn(models.Model):

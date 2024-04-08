@@ -33,9 +33,16 @@
         <button id="week_summary_button">Show week data</button>
     </div>
 
+    
 
-    <div id="all_data" style="display: none">
+    <div id="all_data" style="display: block">
         <h2>all workouts:</h2>
+        <form method="GET">
+            <a href="/char_page?week_data=true">show weeks</a>
+           <a href="/char_page?week_previous=true">pervious week</a>
+           <a href="/char_page?week_next=true">next week</a>
+        </form>
+    
         <div>
             <table>
                 <tr>
@@ -56,14 +63,14 @@
                                 {% endfor %}
                             </table>
                                 <table>
-                            <tr>
-                                <td>{% load my_filters %}
-                                    {% if daily_avg_fatigue|get:day.date %}
-                                        avg daily ftg: {{ daily_avg_fatigue|get:day.date }}
-                                    {% else %}
-                                        -
-                                    {% endif %}</td>
-                            </tr>
+{#                            <tr>#}
+{#                                <td>{% load my_filters %}#}
+{#                                    {% if daily_avg_fatigue|get:day.date %}#}
+{#                                        avg daily ftg: {{ daily_avg_fatigue|get:day.date }}#}
+{#                                    {% else %}#}
+{#                                        -#}
+{#                                    {% endif %}</td>#}
+{#                            </tr>#}
                         </table>
                         </td>
                     {% endfor %}
@@ -148,9 +155,19 @@
 
         </div>
     </div>
+{#------------------ WEEK ----------------------------#}
 
     <div id="week_summary" style="display: block;">
         <h2>week summary:</h2>
+    
+        <div id="week_buttons">
+            <button id ='week_data'>show weeks</button>
+           <button id="week_summary_button">previous week data</button>
+           <button id="week_summary_button">next week data</button>
+    </div>
+    
+    
+    
         <div>
             <table>
                 <tr>
@@ -218,6 +235,8 @@
     </div>
 
 
+    
+    
     </body>
     </html>
 

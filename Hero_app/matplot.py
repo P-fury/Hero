@@ -22,7 +22,7 @@ def get_plot(lists):
     ax1.set_yticks([i for i in range(0, 6)])
 
     ax2 = ax1.twinx()
-    ax2.plot(lists[0], lists[2])
+    ax2.plot(lists[0], lists[2], marker='.')
     ax2.set_ylabel('amount of workouts', color='blue')
     ax2.set_yticks([i for i in range(0, 6)])
 
